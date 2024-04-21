@@ -6,6 +6,7 @@ import (
 	"hash/crc32"
 	"math/bits"
 	"net/http"
+	"net/url"
 	"slices"
 	"strings"
 
@@ -36,6 +37,13 @@ func getIndex(c *gin.Context) {
 	} else {
 		c.IndentedJSON(http.StatusNotAcceptable, nil)
 	}
+}
+
+func postIndex(c *gin.Context) {
+	rawURL := c.PostForm("rawURL")
+	fmt.Println(rawURL)
+	longURL := url.QueryEscape(rawURL)
+	c.Redirect(http.StatusFound, fmt.Sprintf("/shorten?longURL=%s", longURL))
 }
 
 func getLink(c *gin.Context) {
@@ -97,6 +105,7 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 
 	router.GET("/", getIndex)
+	router.POST("/", postIndex)
 	router.GET("/:id", getLink)
 	router.GET("/shorten", shortenLink)
 
