@@ -10,6 +10,16 @@ import (
 
 const ServerDomain = "localhost:8080"
 
+type Link struct {
+	ID       uint32 `json:"id"`
+	LongURL  string `json:"longURL"`
+	ShortURL string `json:"shortURL"`
+}
+
+var links = []Link{
+	{1, "https://www.youtube.com/watch?v=7jMlFXouPk8", "2af5e8c4"},
+}
+
 func acceptsHTML(c *gin.Context) bool {
 	accept := c.GetHeader("Accept")
 	acceptedMimes := strings.Split(accept, ",")
