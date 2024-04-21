@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/binary"
+	"fmt"
+	"hash/crc32"
+	"math/bits"
 	"net/http"
 	"slices"
 	"strings"
@@ -54,12 +58,47 @@ func getLink(c *gin.Context) {
 	}
 }
 
+func shortenLink(c *gin.Context) {
+	longURL := c.Query("longURL")
+	fmt.Println(longURL)
+	urlHash := ""
+	for _, link := range links {
+		if link.LongURL == longURL {
+			urlHash = link.ShortURL
+		}
+	}
+
+	if urlHash == "" {
+		id := links[len(links)-1].ID + 1
+		urlHash = fmt.Sprintf("%x", getHash(id))
+		newLink := Link{id, longURL, urlHash}
+		links = append(links, newLink)
+	}
+
+	shortURL := fmt.Sprintf("%v/%v", ServerDomain, urlHash)
+	fmt.Println(shortURL)
+	if acceptsHTML(c) {
+		c.HTML(http.StatusOK, "shorten.tmpl", gin.H{"shortURL": shortURL})
+	} else {
+		c.IndentedJSON(http.StatusOK, gin.H{"shortURL": shortURL})
+	}
+}
+
+func getHash(id uint32) uint32 {
+	reversedPoly := bits.Reverse32(0xF4ACFB13)
+	t := crc32.MakeTable(reversedPoly)
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint32(b, id)
+	return crc32.Checksum(b, t)
+}
+
 func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
 	router.GET("/", getIndex)
 	router.GET("/:id", getLink)
+	router.GET("/shorten", shortenLink)
 
 	router.Run(ServerDomain)
 }
