@@ -34,11 +34,32 @@ func getIndex(c *gin.Context) {
 	}
 }
 
+func getLink(c *gin.Context) {
+	renderHTML := acceptsHTML(c)
+	shortURL := c.Param("id")
+	for _, link := range links {
+		if link.ShortURL == shortURL {
+			if renderHTML {
+				c.Redirect(http.StatusFound, link.LongURL)
+			} else {
+				c.IndentedJSON(http.StatusOK, link.LongURL)
+			}
+			return
+		}
+	}
+	if renderHTML {
+		c.HTML(http.StatusNotFound, "missing.tmpl", nil)
+	} else {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "link not found"})
+	}
+}
+
 func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
 	router.GET("/", getIndex)
+	router.GET("/:id", getLink)
 
 	router.Run(ServerDomain)
 }
