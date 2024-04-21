@@ -1,0 +1,15 @@
+{{template "header.tmpl"}}
+<script>
+    function copy_to_clipboard(element_id) {
+        var copyText = document.getElementById(element_id);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+        navigator.clipboard.writeText(copyText.value);
+    }
+</script>
+<h1 class="display-4">Here's your link!</h1>
+<div class="input-group mb-3">
+  <input readonly id="shortenedLink" type="text" class="form-control" value="{{.shortURL}}" aria-label="Shortened link" aria-describedby="button-addon2">
+  <button class="btn btn-outline-primary" type="button" onClick="copy_to_clipboard('shortenedLink')" id="button-addon2">Copy</button>
+</div>
+{{template "footer.tmpl"}}
