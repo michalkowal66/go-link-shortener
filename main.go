@@ -56,28 +56,42 @@ func getIndex(c *gin.Context) {
 
 func postIndex(c *gin.Context) {
 	rawURL := c.PostForm("rawURL")
-	fmt.Println(rawURL)
 	longURL := url.QueryEscape(rawURL)
 	c.Redirect(http.StatusFound, fmt.Sprintf("/shorten?longURL=%s", longURL))
 }
 
 func getLink(c *gin.Context) {
 	renderHTML := acceptsHTML(c)
-	shortURL := c.Param("id")
-	for _, link := range links {
-		if link.ShortURL == shortURL {
-			if renderHTML {
-				c.Redirect(http.StatusFound, link.LongURL)
+	urlCode := c.Param("id")
+
+	var link Link
+	res := db.Where("url_code = ?", urlCode).First(&link)
+
+	if res.Error == nil {
+		link.TimesAccessed += 1
+		link.LastAccessed = time.Now()
+
+		res := db.Save(&link)
+		if res.Error != nil {
+			if acceptsHTML(c) {
+				c.Status(http.StatusInternalServerError)
 			} else {
-				c.IndentedJSON(http.StatusOK, link.LongURL)
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal error, unable to access link information"})
 			}
 			return
 		}
-	}
-	if renderHTML {
-		c.HTML(http.StatusNotFound, "missing.tmpl", nil)
+
+		if renderHTML {
+			c.Redirect(http.StatusFound, link.LongURL)
+		} else {
+			c.IndentedJSON(http.StatusOK, link.LongURL)
+		}
 	} else {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "link not found"})
+		if renderHTML {
+			c.HTML(http.StatusNotFound, "missing.tmpl", nil)
+		} else {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "link not found"})
+		}
 	}
 }
 
