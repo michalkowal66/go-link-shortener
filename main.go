@@ -97,23 +97,37 @@ func getLink(c *gin.Context) {
 
 func shortenLink(c *gin.Context) {
 	longURL := c.Query("longURL")
-	fmt.Println(longURL)
-	urlHash := ""
-	for _, link := range links {
-		if link.LongURL == longURL {
-			urlHash = link.ShortURL
+	curr_time := time.Now()
+
+	var link Link
+	res := db.Where("long_url = ?", longURL).First(&link)
+
+	if res.Error != nil {
+		link = Link{LongURL: longURL, CreatedOn: curr_time, LastAccessed: curr_time, TimesAccessed: 1}
+
+		res := db.Create(&link)
+		if res.Error != nil {
+			if acceptsHTML(c) {
+				c.Status(http.StatusInternalServerError)
+			} else {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal error, unable to create short link"})
+			}
+			return
+		}
+
+		link.URLCode = fmt.Sprintf("%x", getHash(link.ID))
+		res = db.Save(&link)
+		if res.Error != nil {
+			if acceptsHTML(c) {
+				c.Status(http.StatusInternalServerError)
+			} else {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal error, unable to update short link"})
+			}
+			return
 		}
 	}
 
-	if urlHash == "" {
-		id := links[len(links)-1].ID + 1
-		urlHash = fmt.Sprintf("%x", getHash(id))
-		newLink := Link{id, longURL, urlHash}
-		links = append(links, newLink)
-	}
-
-	shortURL := fmt.Sprintf("%v/%v", ServerDomain, urlHash)
-	fmt.Println(shortURL)
+	shortURL := fmt.Sprintf("%v/%v", ServerDomain, link.URLCode)
 	if acceptsHTML(c) {
 		c.HTML(http.StatusOK, "shorten.tmpl", gin.H{"shortURL": shortURL})
 	} else {
