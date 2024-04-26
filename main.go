@@ -4,25 +4,40 @@ import (
 	"encoding/binary"
 	"fmt"
 	"hash/crc32"
+	"log"
 	"math/bits"
 	"net/http"
 	"net/url"
+	"os"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const ServerDomain = "localhost:8080"
 
+var db *gorm.DB = nil
+
 type Link struct {
-	ID       uint32 `json:"id"`
-	LongURL  string `json:"longURL"`
-	ShortURL string `json:"shortURL"`
+	ID            uint32    `json:"id"`
+	LongURL       string    `json:"longURL"`
+	URLCode       string    `json:"urlCode"`
+	CreatedOn     time.Time `json:"createdOn"`
+	LastAccessed  time.Time `json:"lastAccessed"`
+	TimesAccessed uint32    `json:"timesAccessed"`
 }
 
-var links = []Link{
-	{1, "https://www.youtube.com/watch?v=7jMlFXouPk8", "2af5e8c4"},
+func connectDB() (*gorm.DB, error) {
+	dsn := fmt.Sprintf("%v:%v@tcp(localhost:3306)/go_link_shortener?charset=utf8mb4&parseTime=True&loc=Local", os.Getenv("DBUSER"), os.Getenv("DBPASS"))
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 func acceptsHTML(c *gin.Context) bool {
@@ -101,6 +116,12 @@ func getHash(id uint32) uint32 {
 }
 
 func main() {
+	var err error
+	db, err = connectDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
