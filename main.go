@@ -159,6 +159,12 @@ func main() {
 	router.POST("/", postIndex)
 	router.GET("/:id", getLink)
 	router.GET("/shorten", shortenLink)
+	router.GET("/about", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "about.tmpl", nil)
+	})
+	router.GET("/contact", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "contact.tmpl", nil)
+	})
 
 	router.Run(ServerDomain)
 }
