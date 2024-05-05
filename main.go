@@ -86,13 +86,13 @@ func getLink(c *gin.Context) {
 		if renderHTML {
 			c.Redirect(http.StatusFound, link.LongURL)
 		} else {
-			c.IndentedJSON(http.StatusOK, link.LongURL)
+			c.IndentedJSON(http.StatusOK, gin.H{"longURL": link.LongURL})
 		}
 	} else {
 		if renderHTML {
 			c.HTML(http.StatusNotFound, "missing.tmpl", nil)
 		} else {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "link not found"})
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "link not found"})
 		}
 	}
 }
@@ -159,6 +159,15 @@ func main() {
 	router.POST("/", postIndex)
 	router.GET("/:id", getLink)
 	router.GET("/shorten", shortenLink)
+	router.GET("/about", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "about.tmpl", nil)
+	})
+	router.GET("/api", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "api.tmpl", nil)
+	})
+	router.GET("/contact", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "contact.tmpl", nil)
+	})
 
 	router.Run(ServerDomain)
 }
