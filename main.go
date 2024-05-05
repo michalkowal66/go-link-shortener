@@ -162,6 +162,9 @@ func main() {
 	router.GET("/about", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "about.tmpl", nil)
 	})
+	router.GET("/api", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "api.tmpl", nil)
+	})
 	router.GET("/contact", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "contact.tmpl", nil)
 	})
