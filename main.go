@@ -86,13 +86,13 @@ func getLink(c *gin.Context) {
 		if renderHTML {
 			c.Redirect(http.StatusFound, link.LongURL)
 		} else {
-			c.IndentedJSON(http.StatusOK, link.LongURL)
+			c.IndentedJSON(http.StatusOK, gin.H{"longURL": link.LongURL})
 		}
 	} else {
 		if renderHTML {
 			c.HTML(http.StatusNotFound, "missing.tmpl", nil)
 		} else {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "link not found"})
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "link not found"})
 		}
 	}
 }
