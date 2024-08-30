@@ -20,7 +20,8 @@ import (
 
 // TODO: improve error handling, add template for 5xx error
 
-const ServerDomain = "localhost:8080"
+var ServerDomain = os.Getenv("DOMAIN")
+const ServingAt = "localhost:8080"
 
 var db *gorm.DB = nil
 
@@ -169,5 +170,5 @@ func main() {
 		c.HTML(http.StatusOK, "contact.tmpl", nil)
 	})
 
-	router.Run(ServerDomain)
+	router.Run(ServingAt)
 }
