@@ -1,0 +1,96 @@
+{{template "header.tmpl"}}
+
+<h1 class="display-4">API</h1>
+<p class="lead">The application exposes a set of endpoints to the application users.</p>
+
+<div class="container">
+    <hr class="featurette-divider">
+
+    <div class="row featurette">
+        <div class="col-md-7">
+            <h2 class="featurette-heading fw-normal lh-1">Shorten link</h2>
+            <p class="lead">Shorten the link provided in the query string.</p>
+        </div>
+        <div class="col-md-5">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h5 class="my-0 fw-normal">Endpoint</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title"><span class="badge text-bg-primary rounded-pill">GET</span> /shorten?longURL=<span class="badge text-bg-secondary">URL</span></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="row featurette">
+    <div class="col-12 col-md-6">
+        <div class="card border-success mb-3">
+        <div class="card-header">Success response example</div>
+        <div class="card-body">
+            <p class="card-text">{ "shortURL": "https://shorter.url/6s15f4ab" }</p>
+        </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="card border-danger mb-3">
+        <div class="card-header">Error response example</div>
+        <div class="card-body">
+            <p class="card-text">{ "error": "error message" }</p>
+        </div>
+        </div>
+    </div>
+</div>
+
+    <hr class="featurette-divider">
+
+    <div class="row featurette">
+        <div class="col-md-7">
+            <h2 class="featurette-heading fw-normal lh-1">Access link</h2>
+            <p class="lead">Retrieve the long URL using the id parameter.</p>
+        </div>
+        <div class="col-md-5">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h5 class="my-0 fw-normal">Endpoint</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title"><span class="badge text-bg-primary rounded-pill">GET</span> /:id</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="row featurette">
+    <div class="col-12 col-md-6">
+        <div class="card border-success mb-3">
+        <div class="card-header">Success response example</div>
+        <div class="card-body">
+            <p class="card-text">{ "longURL": "https://long.url" }</p>
+        </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="card border-danger mb-3">
+        <div class="card-header">Error response example</div>
+        <div class="card-body">
+            <p class="card-text">{ "error": "error message" }</p>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+    <hr class="featurette-divider">
+
+  </div>
+
+<div class="row row-cols-1 mb-3 text-center">
+    <div class="col">
+    
+    </div>
+</div>
+
+{{template "footer.tmpl"}}
