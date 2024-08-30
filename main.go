@@ -21,7 +21,7 @@ import (
 // TODO: improve error handling, add template for 5xx error
 
 var ServerDomain = os.Getenv("DOMAIN")
-const ServingAt = os.Getenv("SERVING_AT")
+var ServingAt = os.Getenv("SERVING_AT")
 
 var db *gorm.DB = nil
 
